@@ -1,0 +1,41 @@
+//
+//  Item_HotTopicDetail.h
+//  if_wapeng
+//
+//  Created by 早上好 on 14-9-11.
+//  Copyright (c) 2014年 funeral. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface Item_HotTopicDetail : NSObject
+@property (strong, nonatomic) NSString *_id;
+@property (strong, nonatomic) NSString *isClosed;//有效日期
+@property (strong, nonatomic)  NSString *TopicTitle;//话题题目
+@property (strong, nonatomic)  NSString *TopicContent;//话题内容
+@property (strong, nonatomic)  NSString *authorPhoto;//头像URL
+@property (strong, nonatomic)  NSString *petName;//作者昵称
+@property (strong, nonatomic)  NSString *childAge;//孩子年龄
+@property (strong, nonatomic)  NSString *childGender;//孩子性别
+@property (nonatomic,strong) NSMutableArray * attachmentList;//附件图片数组
+@property (assign, nonatomic)  NSInteger likeCount;//点赞数
+@property (assign, nonatomic)  NSInteger commentCount;//评论数
+@property (strong, nonatomic)  NSString * placeName;
+@property (assign, nonatomic)  NSInteger viewReportFlag;//是否举报
+@property (assign, nonatomic)  NSInteger viewStoreFlag;//是否收藏
+@property (assign, nonatomic)  NSInteger viewSupportFlag;//是否点赞
+@property (assign, nonatomic)  NSInteger delFlag;//是否删除
+///是否匿名
+@property (assign, nonatomic)  NSInteger anonymousFlag;
+
+
+//@property (assign, nonatomic)  float latitude;//纬度
+//@property (assign, nonatomic)  float longitude;//经度
+
+/**计算话题详细cell高度*/
+-(float)getTopicDetailCellHeight:(float)newHeight;
+/**根据话题内容计算高度*/
+-(float)getTopicContentViewHeight;
+/**计算所有附件图片占用的高度*/
+-(float)getTopicImageGroupHeight;
+@end

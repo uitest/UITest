@@ -1,0 +1,40 @@
+//
+//  ASIVC03.m
+//  if_wapeng
+//
+//  Created by 心 猿 on 15-1-4.
+//  Copyright (c) 2015年 funeral. All rights reserved.
+//
+
+#import "ASIVC03.h"
+
+@interface ASIVC03 ()
+
+@end
+
+@implementation ASIVC03
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    self.textView.text = @"daxue zhongyong lunyu mengz";
+    
+//    NSRegularExpression * regex = [NSRegularExpression alloc]initWithPattern:<#(NSString *)#> options:<#(NSRegularExpressionOptions)#> error:<#(NSError *__autoreleasing *)#>
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

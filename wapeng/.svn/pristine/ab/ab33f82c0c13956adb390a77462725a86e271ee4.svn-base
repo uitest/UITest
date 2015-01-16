@@ -1,0 +1,105 @@
+//
+//  WeChatKeyboardVC.h
+//  if_wapeng
+//
+//  Created by 心 猿 on 15-1-8.
+//  Copyright (c) 2015年 funeral. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+
+#import "JSBubbleMessageCell.h"
+#import "JSMessageInputView.h"
+#import "JSMessageSoundEffect.h"
+#import "UIButton+JSMessagesView.h"
+
+
+#define kAllowsMedia		YES
+
+//typedef enum {
+//    JSMessagesViewTimestampPolicyAll = 0,
+//    JSMessagesViewTimestampPolicyAlternating,
+//    JSMessagesViewTimestampPolicyEveryThree,
+//    JSMessagesViewTimestampPolicyEveryFive,
+//    JSMessagesViewTimestampPolicyCustom
+//} JSMessagesViewTimestampPolicy;
+//
+//
+//typedef enum {
+//    JSMessagesViewAvatarPolicyIncomingOnly = 0,
+//    JSMessagesViewAvatarPolicyBoth,
+//    JSMessagesViewAvatarPolicyNone
+//} JSMessagesViewAvatarPolicy;
+
+
+@protocol JSMessagesViewDelegate <NSObject>
+@required
+- (void)sendPressed:(UIButton *)sender withText:(NSString *)text;
+- (void)cameraPressed:(id)sender;
+- (JSBubbleMessageType)messageTypeForRowAtIndexPath:(NSIndexPath *)indexPath;
+- (JSBubbleMessageStyle)messageStyleForRowAtIndexPath:(NSIndexPath *)indexPath;
+- (JSBubbleMediaType)messageMediaTypeForRowAtIndexPath:(NSIndexPath *)indexPath;
+- (JSMessagesViewTimestampPolicy)timestampPolicy;
+- (JSMessagesViewAvatarPolicy)avatarPolicy;
+- (JSAvatarStyle)avatarStyle;
+
+@optional
+- (BOOL)hasTimestampForRowAtIndexPath:(NSIndexPath *)indexPath;
+
+@end
+
+
+
+@protocol JSMessagesViewDataSource <NSObject>
+@required
+- (NSString *)textForRowAtIndexPath:(NSIndexPath *)indexPath;
+- (NSDate *)timestampForRowAtIndexPath:(NSIndexPath *)indexPath;
+- (UIImage *)avatarImageForIncomingMessage;
+- (UIImage *)avatarImageForOutgoingMessage;
+- (SEL)avatarImageForIncomingMessageAction;
+- (SEL)avatarImageForOutgoingMessageAction;
+@optional
+- (id)dataForRowAtIndexPath:(NSIndexPath *)indexPath;
+@end
+
+@interface WeChatKeyboardVC : UIViewController <UITableViewDataSource, UITableViewDelegate, UITextViewDelegate, JSMessageInputViewDelegate>
+
+@property (weak, nonatomic) id<JSMessagesViewDelegate> delegate;
+@property (weak, nonatomic) id<JSMessagesViewDataSource> dataSource;
+
+@property (strong, nonatomic) UITableView *tableView;
+@property (strong, nonatomic) JSMessageInputView *inputToolBarView;
+@property (assign, nonatomic) CGFloat previousTextViewContentHeight;
+@property (assign, nonatomic, readonly) UIEdgeInsets originalTableViewContentInset;
+
+@property (nonatomic,strong) NSMutableArray *selectedMarks;
+///添加的属性，用于记录哪一行被点击
+@property (nonatomic, strong) NSIndexPath * index;
+#pragma mark - Initialization
+- (UIButton *)sendButton;
+
+#pragma mark - Actions
+- (void)sendPressed:(UIButton *)sender;
+
+#pragma mark - Messages view controller
+- (BOOL)shouldHaveTimestampForRowAtIndexPath:(NSIndexPath *)indexPath;
+- (BOOL)shouldHaveAvatarForRowAtIndexPath:(NSIndexPath *)indexPath;
+- (void)finishSend:(BOOL)isMedia;
+
+- (void)finishSend:(BOOL)isMedia andIndexPath:(NSIndexPath *)indexPath;
+
+- (void)setBackgroundColor:(UIColor *)color;
+- (void)scrollToBottomAnimated:(BOOL)animated;
+
+//添加的方法，用于滚动到相应的行
+-(void)scrollAccPositionWithIndexPath:(NSIndexPath *)indexPath;
+
+#pragma mark - Keyboard notifications
+- (void)handleWillShowKeyboard:(NSNotification *)notification;
+- (void)handleWillHideKeyboard:(NSNotification *)notification;
+- (void)keyboardWillShowHide:(NSNotification *)notification;
+
+
+
+@end

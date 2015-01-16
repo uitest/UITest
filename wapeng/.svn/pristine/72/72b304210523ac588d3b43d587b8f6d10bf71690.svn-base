@@ -1,0 +1,24 @@
+//
+//  UserInfoConnectionTask.h
+//  if_wapeng
+//
+//  Created by 心 猿 on 14-12-17.
+//  Copyright (c) 2014年 funeral. All rights reserved.
+//
+@class DataItem;
+@protocol getUserInfoDelegate <NSObject>
+
+-(void)getItemFinished:(DataItem *)item;
+
+-(void)getItemFailed;
+
+@end
+
+#import <Foundation/Foundation.h>
+
+@interface UserInfoConnectionTask : NSObject
+
+@property (nonatomic , weak) id <getUserInfoDelegate> delegate;
+
+-(void)getUserInfo;
+@end

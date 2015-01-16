@@ -1,0 +1,152 @@
+//
+//  UserInfoConnectionTask.m
+//  if_wapeng
+//
+//  Created by 心 猿 on 14-12-17.
+//  Copyright (c) 2014年 funeral. All rights reserved.
+//
+
+#import "UserInfoConnectionTask.h"
+
+#import "DataItem.h"
+
+#import "AFN_HttpBase.h"
+@implementation UserInfoConnectionTask
+
++(BOOL)isLocoalItemExist
+{
+    NSFileManager * fm = [NSFileManager defaultManager];
+    
+    if ([fm fileExistsAtPath:[DataItem savePath]]) {
+        
+        NSLog(@"磁盘中已经有用户信息，不需要网络请求");
+        
+        
+        return YES;
+    }
+    
+    return NO;
+}
+
+-(void)getUserInfo
+{
+    BOOL isExist = [[self class] isLocoalItemExist];
+    
+    if (isExist) {
+        
+        DataItem * item = [DataItem readItem];
+        
+        
+        if ([self.delegate respondsToSelector:@selector(getItemFinished:)]) {
+            
+            self.item = item;
+
+            [self.delegate getItemFinished:self];
+        }
+        
+        return;
+        
+    }else{
+        
+        [self connection];
+    }
+}
+-(void)connection
+{
+    NSUserDefaults * d = [NSUserDefaults standardUserDefaults];
+    
+    NSString * ddid = [d objectForKey:UD_ddid];
+    
+    NSMutableDictionary * postDict = [[NSMutableDictionary alloc]initWithObjectsAndKeys:ddid , @"D_ID", nil];
+    
+    DataItem * item = [[DataItem alloc]init];
+    
+    AFN_HttpBase * http = [[AFN_HttpBase alloc]init];
+    
+    __weak UserInfoConnectionTask * weakSelf = self;
+    
+    [http fiveReuqestUrl:dUrl_OSM_1_1_3 postDict:postDict succeed:^(NSObject *obj, BOOL isFinished) {
+        
+        NSDictionary * root = (NSDictionary *)obj;
+        
+        item.petName = [[root objectForKey:@"value"] objectForKey:@"petName"];
+        
+        //先赋值
+        item.relativePath = @"";
+        if (![[root objectForKey:@"value"] isKindOfClass:[NSNull class]]) {
+            
+            if (![[[root objectForKey:@"value"] objectForKey:@"photo"] isKindOfClass:[NSNull class]]) {
+                
+                if (![[[[root objectForKey:@"value"] objectForKey:@"photo"] objectForKey:@"relativePath"] isKindOfClass:[NSNull class]]) {
+                    item.relativePath = [NSString stringWithFormat:@"%@%@", dUrl_PhotoPrefixion, [[[root objectForKey:@"value"] objectForKey:@"photo"] objectForKey:@"relativePath"]];
+                }
+            }
+        }
+        
+        item.userType = [[[[root objectForKey:@"value"] objectForKey:@"userType"] objectForKey:@"id"]intValue];
+        
+        
+        if (item.userType == PARENT_USER || item.userType == TEACHER_USER) {
+            
+            item.located = kNullData;
+            
+            if (isNotNull([[root objectForKey:@"value"] objectForKey:@"userInfoExtension"])) {
+                
+                if (isNotNull([[[root objectForKey:@"value"] objectForKey:@"userInfoExtension"] objectForKey:@"located"])) {
+                    
+                    item.located = [[[root objectForKey:@"value"] objectForKey:@"userInfoExtension"] objectForKey:@"located"];
+                }
+            }
+            
+            item.personnelSignature = [[[root objectForKey:@"value"] objectForKey:@"userInfoExtension"] objectForKey:@"personnelSignature"];
+            item.gender =[[[[root objectForKey:@"value"] objectForKey:@"userInfoExtension"] objectForKey:@"gender"]integerValue];
+            item.wpCode = [[root objectForKey:@"value"] objectForKey:@"wpCode"];
+            item.mid = [[[root objectForKey:@"value"] objectForKey:@"userInfoExtension"] objectForKey:@"id"];
+            
+            
+        }else{
+            
+            NSDictionary * value = [root objectForKey:@"value"];
+            
+            item.located = kNullData;
+            if (isNotNull([value objectForKey:@"organizationExtension"])) {
+                if (isNotNull([[value objectForKey:@"organizationExtension"] objectForKey:@"bizAddress"])) {
+                    item.located = [[value objectForKey:@"organizationExtension"] objectForKey:@"bizAddress"];
+                }
+            }
+            
+            NSLog(@"%@", item.located);
+            
+            item.wpCode = [[root objectForKey:@"value"] objectForKey:@"wpCode"];
+            item.personnelSignature =[[value objectForKey:@"organizationExtension"] objectForKey:@"description"];
+            //            item.mid = [value objectForKey:@"organizationExtension" objectForKey:@"id"];
+            item.mid = [[value objectForKey:@"organizationExtension"] objectForKey:@"id"];
+            
+            NSLog(@"%@", item.personnelSignature);
+        }
+        
+        //归档信息
+        
+        [item saveItem];
+        
+        weakSelf.item = item;
+        
+        if ([self.delegate respondsToSelector:@selector(getItemFinished:)]) {
+            [self.delegate getItemFinished:weakSelf];
+        }
+        
+    } failed:^(NSObject *obj, BOOL isFinished) {
+        
+        if ([self.delegate respondsToSelector:@selector(getItemFailed:)]) {
+            
+            DataItem * item = [[DataItem alloc]init];
+            [item defData];
+            self.item = item;
+            [self.delegate getItemFailed:weakSelf];
+        }
+        [SVProgressHUD showErrorWithStatus:dTips_requestError];
+        
+    }];
+}
+
+@end

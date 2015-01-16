@@ -1,0 +1,367 @@
+
+
+#import "MyChatVC.h"
+#import "MessageData.h"
+#import "PrivateConnectionTask.h"
+#import "WUDemoKeyboardBuilder.h"
+#import "UIViewController+General.h"
+
+#import "AppDelegate.h"
+
+#import "SDWebImageManager.h"
+#import "UIImageView+WebCache.h"
+#import "DataItem.h"
+@interface MyChatVC () <JSMessagesViewDelegate, JSMessagesViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate,UIActionSheetDelegate>
+{
+    int pageIndex;//页码
+}
+@property (strong, nonatomic) NSMutableArray *messageArray;
+@property (nonatomic,strong) UIImage *willSendImage;
+
+@property (nonatomic, strong) UITextView * textView;
+
+@end
+
+@implementation MyChatVC
+
+@synthesize messageArray;
+
+
+- (void)addHeader
+{
+    pageIndex++;
+        // 添加下拉刷新头部控件
+    
+    __weak MyChatVC * weakSelf = self;
+    __block int page = pageIndex;
+        [self.tableView addHeaderWithCallback:^{
+        // 进入刷新状态就会回调这个Block
+    
+            //    NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys:self.peerID, @"letterQuery.recieverID", nil];
+            
+            NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys:@"7d922de5-7c6c-4091-85d6-30f5f4561ed5", @"letterQuery.recieverID", nil];
+            
+            [weakSelf httpRequestWithUrl:dUrl_P2P_1_1_5 page:page otherParaDict:dict];
+            [weakSelf.tableView headerEndRefreshing];
+    }];
+    
+
+}
+
+
+
+//列表类通用的请求
+-(void)httpRequestWithUrl:(NSString *)url page:(int)page otherParaDict:(NSDictionary *)dict
+{
+    NSDictionary * postDict = [ PrivateConnectionTask assmblePostDictWithUrl:url page:page otherParaDict:dict];
+    __weak MyChatVC * weakSelf = self;
+    
+    [PrivateConnectionTask requestWithUrl:url postDict:postDict completeBlock:^(NSMutableArray *tempDataArray, BOOL isFinished) {
+        
+        if (isFinished == YES) {
+
+            [tempDataArray addObjectsFromArray:weakSelf.messageArray];
+            weakSelf.messageArray = tempDataArray;
+            
+            NSLog(@"%@", weakSelf.messageArray);
+            
+            [weakSelf.tableView reloadData];
+        }
+       
+    }];
+
+}
+#pragma mark - View lifecycle
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    self.peerImage = [[UIImage alloc]init];
+    
+    self.title = @"我的私信";
+    
+    self.delegate = self;
+    self.dataSource = self;
+
+    self.messageArray = [NSMutableArray array];
+    
+    self.textView =  self.inputToolBarView.textView;
+    
+      NSLog(@"frame = %@", NSStringFromCGRect(self.textView.frame));
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notify:) name:dNoti_HiddenLeftKeyBoard object:nil];
+    
+    [self initLeftItem];
+    
+    pageIndex = 1;
+    
+//    NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys:self.peerID, @"letterQuery.recieverID", nil];
+    
+     NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys:@"7d922de5-7c6c-4091-85d6-30f5f4561ed5", @"letterQuery.recieverID", nil];
+    
+    [self httpRequestWithUrl:dUrl_P2P_1_1_5 page:1 otherParaDict:dict];
+    
+    [self addHeader];
+}
+
+-(void)navItemClick:(UIButton *)button
+{
+    [self.navigationController popToRootViewControllerAnimated:YES];
+}
+
+-(void)notify:(NSNotification *)notify
+{
+    [self.textView resignFirstResponder];
+}
+
+
+#pragma mark - 模拟网络请求
+
+- (void)testData{
+    
+
+    
+    MessageData *message1 = [[MessageData alloc] initWithMsgId:@"00011111" text:@"This is a Chat Demo like iMessage.app" date:[NSDate date] msgType:JSBubbleMessageTypeIncoming mediaType:JSBubbleMediaTypeText img:nil];
+    
+    [self.messageArray addObject:message1];
+    
+    MessageData *message2 = [[MessageData alloc] initWithMsgId:@"0002" text:nil date:[NSDate date] msgType:JSBubbleMessageTypeOutgoing mediaType:JSBubbleMediaTypeImage img:@"demo1.jpg"];
+    
+    [self.messageArray addObject:message2];
+    
+    MessageData *message3 = [[MessageData alloc] initWithMsgId:@"0003" text:@"Up-to-date for iOS 6.0 and ARC (iOS 5.0+ required) Universal for iPhone Allows arbitrary message (and bubble) sizes Copy & paste text message && Save image message " date:[NSDate date] msgType:JSBubbleMessageTypeOutgoing mediaType:JSBubbleMediaTypeText img:nil];
+    
+    [self.messageArray addObject:message3];
+    
+    
+    [self.messageArray addObject:message3];
+}
+
+
+
+#pragma mark - Table view data source
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return self.messageArray.count;
+}
+
+#pragma mark - Messages view delegate
+- (void)sendPressed:(UIButton *)sender withText:(NSString *)text
+{
+    
+//    NSUserDefaults * d = [NSUserDefaults standardUserDefaults];
+//    
+//    NSString * ddid = [d objectForKey:UD_ddid];
+//    
+//    NSDictionary * postDict = [NSDictionary dictionaryWithObjectsAndKeys:ddid, @"D_ID", text, @"letter.content",  self.peerID , @"letter.recievers",nil];
+//    //发送私信
+//    [PrivateConnectionTask requestWithUrl:P2P_1_1_6 postDict:postDict pageIndex:0 completeBlock:^(NSMutableArray *tempDataArray, BOOL isFinished) {
+//        
+//        
+//        
+//    }];
+
+    
+    int value = arc4random() % 1000;
+    NSString *msgId = [NSString stringWithFormat:@"%d",value];
+    
+    JSBubbleMessageType msgType;
+//    if((self.messageArray.count - 1) % 2){
+//        msgType = JSBubbleMessageTypeOutgoing;
+//        [JSMessageSoundEffect playMessageSentSound];
+//    }else{
+//        msgType = JSBubbleMessageTypeIncoming;
+//        [JSMessageSoundEffect playMessageReceivedSound];
+//    }
+    
+    msgType = JSBubbleMessageTypeOutgoing;
+    [JSMessageSoundEffect playMessageSentSound];
+    
+    MessageData *message = [[MessageData alloc] initWithMsgId:msgId text:text date:[NSDate date] msgType:msgType mediaType:JSBubbleMediaTypeText img:nil];
+    
+    [self.messageArray addObject:message];
+    
+    
+    d = [NSUserDefaults standardUserDefaults];
+    NSString * ddid = [d objectForKey:UD_ddid];
+    
+    NSDictionary * postDict = [NSDictionary dictionaryWithObjectsAndKeys:ddid,@"D_ID", message.text,@"letter.content", self.peerID, @"letter.recievers", nil];
+    
+    __weak MyChatVC * weakSelf = self;
+    
+    [PrivateConnectionTask requestWithUrl:P2P_1_1_6 postDict:postDict completeBlock:^(NSMutableArray *tempDataArray, BOOL isFinished) {
+        
+        if (isFinished) {
+    
+            MessageData * item = [weakSelf.messageArray lastObject];
+            item.isSendSuccess = isFinished;
+            
+            [SVProgressHUD showSuccessWithStatus:dTips_uploadSuccess];
+            
+            [weakSelf.tableView reloadData];
+
+        }
+           }];
+    
+    [self finishSend:NO];
+}
+
+#pragma mark - 切换表情键盘
+
+- (void)cameraPressed:(id)sender{
+    
+    if (self.textView.isFirstResponder) {
+        if (self.textView.emoticonsKeyboard) [self.textView switchToDefaultKeyboard];
+        else [self.textView switchToEmoticonsKeyboard:[WUDemoKeyboardBuilder sharedEmoticonsKeyboard]];
+    }else{
+        [self.textView switchToEmoticonsKeyboard:[WUDemoKeyboardBuilder sharedEmoticonsKeyboard]];
+        [self.textView becomeFirstResponder];
+    }
+}
+
+
+
+- (JSBubbleMessageType)messageTypeForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    MessageData *message = self.messageArray[indexPath.row];
+    return message.messageType;
+}
+
+- (JSBubbleMessageStyle)messageStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return JSBubbleMessageStyleFlat;
+}
+
+- (JSBubbleMediaType)messageMediaTypeForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    MessageData *message = self.messageArray[indexPath.row];
+    return message.mediaType;
+}
+
+- (UIButton *)sendButton
+{
+    return [UIButton defaultSendButton];
+}
+
+- (JSMessagesViewTimestampPolicy)timestampPolicy
+{
+    /*
+     JSMessagesViewTimestampPolicyAll = 0,
+     JSMessagesViewTimestampPolicyAlternating,
+     JSMessagesViewTimestampPolicyEveryThree,
+     JSMessagesViewTimestampPolicyEveryFive,
+     JSMessagesViewTimestampPolicyCustom
+     */
+    return JSMessagesViewTimestampPolicyEveryThree;
+}
+
+- (JSMessagesViewAvatarPolicy)avatarPolicy
+{
+    /*
+     JSMessagesViewAvatarPolicyIncomingOnly = 0,
+     JSMessagesViewAvatarPolicyBoth,
+     JSMessagesViewAvatarPolicyNone
+     */
+    return JSMessagesViewAvatarPolicyBoth;
+}
+
+- (JSAvatarStyle)avatarStyle
+{
+    /*
+     JSAvatarStyleCircle = 0,
+     JSAvatarStyleSquare,
+     JSAvatarStyleNone
+     */
+    return JSAvatarStyleSquare;
+}
+
+- (JSInputBarStyle)inputBarStyle
+{
+    /*
+     JSInputBarStyleDefault,
+     JSInputBarStyleFlat
+     
+     */
+    return JSInputBarStyleFlat;
+}
+
+//  Optional delegate method
+//  Required if using `JSMessagesViewTimestampPolicyCustom`
+//
+//  - (BOOL)hasTimestampForRowAtIndexPath:(NSIndexPath *)indexPath
+//
+
+#pragma mark - Messages view data source
+- (NSString *)textForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    MessageData *message = self.messageArray[indexPath.row];
+    return message.text;
+}
+
+- (NSDate *)timestampForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    MessageData *message = self.messageArray[indexPath.row];
+    return message.date;
+}
+#pragma mark - 他人的头像
+- (UIImage *)avatarImageForIncomingMessage
+{
+    NSURL * url = [NSURL URLWithString:self.peerImageUrl];
+    NSLog(@"%@", self.peerImageUrl);
+    NSData * data = [NSData dataWithContentsOfURL:url];
+    UIImage * image = [UIImage imageWithData:data];
+    return image;
+}
+
+- (SEL)avatarImageForIncomingMessageAction
+{
+    return @selector(onInComingAvatarImageClick);
+}
+
+- (void)onInComingAvatarImageClick
+{
+    NSLog(@"__%s__",__func__);
+}
+
+- (SEL)avatarImageForOutgoingMessageAction
+{
+    return @selector(onOutgoingAvatarImageClick);
+}
+
+- (void)onOutgoingAvatarImageClick
+{
+    NSLog(@"__%s__",__func__);
+}
+#pragma mark - 我的头像
+- (UIImage *)avatarImageForOutgoingMessage
+{
+    DataItem * item = [DataItem readItem];
+    
+    NSURL * url = [NSURL URLWithString:item.relativePath];
+    NSLog(@"%@", self.peerImageUrl);
+    NSData * data = [NSData dataWithContentsOfURL:url];
+    UIImage * image = [UIImage imageWithData:data];
+    return image;
+}
+
+- (id)dataForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    MessageData *message = self.messageArray[indexPath.row];
+    return [UIImage imageNamed:message.img];
+}
+//新加入的方法，控制小菊花是否转动
+#pragma mark - 新加入的方法，控制小菊花是否转动
+-(BOOL)isMessageArrayWithIndex:(NSInteger)index
+{
+    MessageData * item = [self.messageArray objectAtIndex:index];
+    
+    return item.isSendSuccess;
+}
+
+
+-(void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+@end

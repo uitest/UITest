@@ -1,0 +1,93 @@
+//
+//  Cell_HotTopicDetail.m
+//  if_wapeng
+//
+//  Created by 早上好 on 14-9-11.
+//  Copyright (c) 2014年 funeral. All rights reserved.
+//
+#define AttachmentImageSize 55
+#import "Cell_HotTopicDetail.h"
+#import "MyParserTool.h"
+#import "Constant_general.h"
+#import "UIImageView+AFNetworking.h"
+@implementation Cell_HotTopicDetail
+
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        
+    }
+    return self;
+}
+
+- (void)awakeFromNib
+{
+    [super awakeFromNib];
+//        for (int i = 0;i < self.hotTopicDetail.attachmentList.count; i++) {
+//    
+//            UIImageView * iv = [[UIImageView alloc]initWithFrame:CGRectMake(AttachmentImageSize*(i%3),AttachmentImageSize*(i/3), AttachmentImageSize, AttachmentImageSize)];
+//            NSString * imageUrl = self.hotTopicDetail.attachmentList[i];
+//            [iv setImageWithURL:[NSURL URLWithString:imageUrl]];
+//            [self.imageGroup addSubview:iv];
+//        }
+    
+}
+
+-(void)layoutSubviews
+{
+    [super layoutSubviews];
+    
+    CGSize size = [[MyParserTool shareInstance] sizeWithRawString:self.hotTopicDetail.content constrainsToWidth:(kMainScreenWidth * 0.5) Font:[UIFont systemFontOfSize:14]];
+    self.content.frame = CGRectMake(self.content.frame.origin.x, self.content.frame.origin.y, size.width, size.height);
+    self.title.text = self.hotTopicDetail.title;
+    self.content.text = self.hotTopicDetail.content;
+    
+    if (self.hotTopicDetail.headerPath == nil){
+        self.header.image = [UIImage imageNamed:@"2.png"];
+    }else{
+        self.header.image = [UIImage imageNamed:self.hotTopicDetail.headerPath];
+    }
+    
+    self.headerNmae.text = self.hotTopicDetail.headerName;
+    self.age.text = [NSString stringWithFormat:@"%@",self.hotTopicDetail.age];
+    for (int i = 0;i < self.hotTopicDetail.attachmentList.count; i++) {
+        
+        UIImageView * iv = [[UIImageView alloc]initWithFrame:CGRectMake(AttachmentImageSize*(i%3),AttachmentImageSize*(i/3), AttachmentImageSize, AttachmentImageSize)];
+        NSString * imageUrl = self.hotTopicDetail.attachmentList[i];
+        [iv setImageWithURL:[NSURL URLWithString:imageUrl]];
+        [self.imageGroup addSubview:iv];
+    }
+    
+    
+    self.good.text = [NSString stringWithFormat:@"%@",self.hotTopicDetail.good];
+    self.msg.text = [NSString stringWithFormat:@"%@",self.hotTopicDetail.msg];
+    self.contentView.backgroundColor = [UIColor clearColor];
+    if ([self.hotTopicDetail.viewReportFlag isEqualToString:@"1"]) {
+        [self.clickGood setImage:[UIImage imageNamed:@"good_1.png"]];
+    }else{
+        [self.clickGood setImage:[UIImage imageNamed:@"good_2.png"]];
+    }
+    
+    
+    UIView *aView = [[UIView alloc] initWithFrame:self.contentView.frame];
+    
+    aView.backgroundColor = [UIColor whiteColor];
+    
+    self.selectedBackgroundView = aView;
+    
+
+    [self.superview layoutSubviews];
+    
+}
+
+
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated
+{
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+@end

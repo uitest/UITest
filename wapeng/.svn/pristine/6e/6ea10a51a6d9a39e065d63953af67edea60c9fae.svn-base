@@ -1,0 +1,67 @@
+//
+//  DataItem.m
+//  if_wapeng
+//
+//  Created by 心 猿 on 14-11-12.
+//  Copyright (c) 2014年 funeral. All rights reserved.
+//
+
+#import "DataItem.h"
+
+@implementation DataItem
+
+//编码的时候被调用
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+
+    
+    [aCoder encodeObject:self.located forKey:@"located"];
+    [aCoder encodeObject:self.relativePath forKey:@"relativePath"];
+    [aCoder encodeObject:self.petName forKey:@"petName"];
+    [aCoder encodeObject:self.wpCode forKey:@"wpCode"];
+    [aCoder encodeObject:[NSNumber numberWithInt:self.gender]
+                  forKey:@"gender"];
+    [aCoder encodeObject:self.personnelSignature forKey:@"personnelSignature"];
+    [aCoder encodeObject:[NSNumber numberWithInt:self.userType] forKey:@"userType"];
+    [aCoder encodeObject:self.mid forKey:@"mid"];
+}
+- (id)initWithCoder:(NSCoder *)aDecoder
+{
+    if (self = [super init]) {
+        
+        self.located = [aDecoder decodeObjectForKey:@"located"];
+        self.relativePath = [aDecoder decodeObjectForKey:@"relativePath"];
+        self.petName = [aDecoder decodeObjectForKey:@"petName"];
+        self.wpCode = [aDecoder decodeObjectForKey:@"wpCode"];
+        self.gender = [[aDecoder decodeObjectForKey:@"gender"] intValue];
+        self.personnelSignature = [aDecoder decodeObjectForKey:@"personnelSignature"];
+        self.userType = [[aDecoder decodeObjectForKey:@"personnelSignature"] intValue];
+        self.mid = [aDecoder decodeObjectForKey:@"mid"];
+        
+    }
+    return self;
+    
+}
+/**返回保存路径**/
++(NSString *)savePath
+{
+   NSString * filePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    filePath = [filePath stringByAppendingPathComponent:@"DataItem"];
+    
+    return filePath;
+}
+
+-(void)saveItem
+{
+    NSString * filePath = [DataItem savePath];
+    
+    [NSKeyedArchiver archiveRootObject:self toFile:filePath];
+}
++(DataItem *)readItem
+{
+    NSString * filePath = [DataItem savePath];
+    DataItem * item = [NSKeyedUnarchiver unarchiveObjectWithFile:filePath];
+
+    return item;
+}
+@end

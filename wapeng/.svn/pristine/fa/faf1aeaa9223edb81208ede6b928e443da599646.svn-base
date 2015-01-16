@@ -1,0 +1,174 @@
+//
+//  Cell_HotTopicDetail.m
+//  if_wapeng
+//
+//  Created by 早上好 on 14-9-11.
+//  Copyright (c) 2014年 funeral. All rights reserved.
+//
+#define AttachmentImageSize 55
+#import "Cell_HotTopicDetail.h"
+#import "MyParserTool.h"
+#import "Constant_general.h"
+#import "UIImageView+WebCache.h"
+@implementation Cell_HotTopicDetail
+
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+
+    }
+    return self;
+}
+
+- (void)awakeFromNib
+{
+    [super awakeFromNib];
+//        for (int i = 0;i < self.hotTopicDetail.attachmentList.count; i++) {
+//    
+//            UIImageView * iv = [[UIImageView alloc]initWithFrame:CGRectMake(AttachmentImageSize*(i%3),AttachmentImageSize*(i/3), AttachmentImageSize, AttachmentImageSize)];
+//            NSString * imageUrl = self.hotTopicDetail.attachmentList[i];
+//            [iv setImageWithURL:[NSURL URLWithString:imageUrl]];
+//            [self.imageGroup addSubview:iv];
+//        }
+    
+}
+
+-(void)layoutSubviews
+{
+    [super layoutSubviews];
+    //创建imageview数组
+    self.imageGroup = [NSArray arrayWithObjects:self.image1,self.image2,self.image3,self.image4,self.image5,self.image6,self.image7,self.image8,self.image9,nil];
+    NSLog(@"------- imageGroup.count = %d",self.imageGroup.count);
+    for (int i = 0; i<self.imageGroup.count; i++) {
+        UIImageView * iv = self.imageGroup[i];
+        iv.hidden = YES;
+    }
+    NSLog(@"--------- attachmentList = %@",self.hotTopicDetail.attachmentList);
+    if (![self.hotTopicDetail.attachmentList isKindOfClass:[NSNull class]] && self.hotTopicDetail.attachmentList.count != 0 )
+    {
+        for (int i = 0; i< self.hotTopicDetail.attachmentList.count; i++) {
+            UIImageView * currentIV = self.imageGroup[i];
+            currentIV.backgroundColor = [UIColor lightGrayColor];
+            currentIV.hidden = NO;
+            NSString * imageStr = self.hotTopicDetail.attachmentList[i];
+            [currentIV setImageWithURL:[NSURL URLWithString:imageStr]];
+            
+        }
+    }
+
+//    CGSize size = [[MyParserTool shareInstance] sizeWithRawString:self.hotTopicDetail.content constrainsToWidth:(kMainScreenWidth * 0.5) Font:[UIFont systemFontOfSize:14]];
+//    
+    //头像设置
+    if ([self.hotTopicDetail.authorPhoto isEqualToString:@"111111"]){
+        self.authorPhotoIV.image = [UIImage imageNamed:@"tab_selected.jpg"];
+    }else{
+        [self.authorPhotoIV setImageWithURL:[NSURL URLWithString:self.hotTopicDetail.authorPhoto] placeholderImage:[UIImage imageNamed:@"zjgw_logo@2x.png"]];
+    }
+    //家长昵称
+    self.petName.text = self.hotTopicDetail.petName;
+    //孩子年龄(解析宝宝性别拼写字符串)
+    if (self.hotTopicDetail.childAge != 0 && ![@""isEqualToString:self.hotTopicDetail.childGender]) {
+         self.childAge.text= [NSString stringWithFormat:@"%@/%@",self.hotTopicDetail.childGender,self.hotTopicDetail.childAge];
+    }else{
+        self.childAge.text = @"无宝宝";
+    }
+
+    //话题是否关闭
+    self.isClose.text = self.hotTopicDetail.isClosed;
+    //话题题目
+    self.TopicNameLabel.text = self.hotTopicDetail.TopicTitle;
+//    //话题内容
+    NSLog(@"------------- TopicContent = %@----------",self.hotTopicDetail.TopicContent);
+//    self.TopicContent.text = self.hotTopicDetail.TopicContent;
+    //点赞数
+    self.likeCountLabel.text = [NSString stringWithFormat:@"%d",self.hotTopicDetail.likeCount];
+    //评论数
+    self.commentCountLabel.text = [NSString stringWithFormat:@"%d",self.hotTopicDetail.commentCount];
+    
+    
+//    self.content.frame = CGRectMake(self.content.frame.origin.x, self.content.frame.origin.y, size.width, size.height);
+//    self.title.text = self.hotTopicDetail.title;
+//    self.content.text = self.hotTopicDetail.content;
+//    
+//    if (self.hotTopicDetail.headerPath == nil){
+//        self.header.image = [UIImage imageNamed:@"2.png"];
+//    }else{
+//        self.header.image = [UIImage imageNamed:self.hotTopicDetail.headerPath];
+//    }
+//    
+//    self.headerNmae.text = self.hotTopicDetail.headerName;
+//    self.age.text = [NSString stringWithFormat:@"%@",self.hotTopicDetail.age];
+    
+//    float height = 0;
+//    NSInteger count = self.hotTopicDetail.attachmentList.count;
+//    if (count < 4) {
+//        height += AttachmentImageSize;
+//    }else if (count < 7 && count > 3){
+//        height += AttachmentImageSize*2 + 10;
+//        
+//    }else if (count < 10 && count > 6){
+//        height += AttachmentImageSize*3 + 10*2;
+//    }
+    
+    //    height += (((self.hotTopicDetail.attachmentList.count/4)+1)*AttachmentImageSize);
+    //    //根据行数加入间隔距离
+    //    self.hotTopicDetail.attachmentList.count/3 == 1?(height+=20):(height+=40);
+//    self.imageGroup.bounds = CGRectMake(0, 0, kMainScreenWidth * 0.65, height);
+//    self.imageGroup.backgroundColor = [UIColor lightGrayColor];
+//    for (int i = 0;i < self.hotTopicDetail.attachmentList.count; i++) {
+//        NSLog(@"%@",self.hotTopicDetail.attachmentList);
+//        
+//        UIImageView * iv = [[UIImageView alloc]initWithFrame:CGRectMake(AttachmentImageSize*(i%3),AttachmentImageSize*((i/3)+1)*10, AttachmentImageSize, AttachmentImageSize)];
+////        NSString * imageUrl = self.hotTopicDetail.attachmentList[i];
+//        
+//        [self.imageGroup addSubview:iv];
+////        [iv setImageWithURL:[NSURL URLWithString:imageUrl]];
+////        [self.imageGroup setNeedsLayout];
+//    }
+//    
+//    for (int i = 0;i < self.hotTopicDetail.attachmentList.count; i++) {
+//        NSString * imageUrl = self.hotTopicDetail.attachmentList[i];
+//        UIImageView * iv = self.imageGroup.subviews[i];
+//        [iv setImageWithURL:[NSURL URLWithString:imageUrl]];
+//    }
+//    NSLog(@"%@",
+//          );
+   
+    //imageGroup view 高度
+    
+//    NSLog(@"%@",NSHomeDirectory());
+////    [self.imageGroup layoutSubviews];
+//    NSLog(@"%@",self.imageGroup.subviews);
+    
+//    self.good.text = [NSString stringWithFormat:@"%@",self.hotTopicDetail.good];
+//    self.msg.text = [NSString stringWithFormat:@"%@",self.hotTopicDetail.msg];
+//    self.contentView.backgroundColor = [UIColor clearColor];
+//    if ([self.hotTopicDetail.viewReportFlag isEqualToString:@"1"]) {
+//        [self.clickGood setImage:[UIImage imageNamed:@"good_1.png"]];
+//    }else{
+//        [self.clickGood setImage:[UIImage imageNamed:@"good_2.png"]];
+//    }
+    
+    
+//    UIView *aView = [[UIView alloc] initWithFrame:self.contentView.frame];
+//    
+//    aView.backgroundColor = [UIColor whiteColor];
+//    
+//    self.selectedBackgroundView = aView;
+    
+
+//    [self.superview layoutSubviews];
+    
+}
+
+
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated
+{
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+@end

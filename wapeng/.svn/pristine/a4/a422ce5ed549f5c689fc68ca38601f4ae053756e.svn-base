@@ -1,0 +1,45 @@
+//
+//  CommonView.m
+//  if_wapeng
+//
+//  Created by 心 猿 on 14-12-23.
+//  Copyright (c) 2014年 funeral. All rights reserved.
+//
+
+#import "CommonView.h"
+
+@implementation CommonView
+
++(UIDatePicker *)datePickerViewWithFrame:(CGRect)frame
+{
+    UIDatePicker * datePicker = [[UIDatePicker alloc]initWithFrame:frame];
+//    UIDatePicker * datePicker = [[UIDatePicker alloc]init];
+    //设置日期格式
+    datePicker.datePickerMode = UIDatePickerModeDate;
+    NSDate * date = [NSDate date];
+    //设置默认时间
+    datePicker.date = date;
+    
+    NSDateFormatter * formatter = [[NSDateFormatter alloc]init];
+    [formatter setDateFormat:@"yyyy年MM月dd日"];
+    return datePicker;
+}
+
+//+(UIToolbar *)toolbarWithFrame:(CGRect)frame ViewController:(UIViewController *)vc
+//{
+////    UIToolbar *toolBar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 44)];
+////    
+////    UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+////    NSMutableArray *myToolBarItems = [NSMutableArray array];
+////    [myToolBarItems addObject:flexibleSpace];
+////    [myToolBarItems addObject:[[UIBarButtonItem alloc]
+////                               initWithTitle:@"确定"
+////                               style:UIBarButtonItemStylePlain
+////                               target:self
+////                               action:@selector(cancelPicker)]];
+////    [toolBar setItems:myToolBarItems animated:YES];
+//    
+//   
+//    return toolbar;
+//}
+@end

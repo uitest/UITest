@@ -1,0 +1,55 @@
+//
+//  UserInfoConnectionTask.m
+//  if_wapeng
+//
+//  Created by 心 猿 on 14-12-17.
+//  Copyright (c) 2014年 funeral. All rights reserved.
+//
+
+#import "UserInfoConnectionTask.h"
+
+#import "DataItem.h"
+
+#import "AFN_HttpBase.h"
+@implementation UserInfoConnectionTask
+
++(BOOL)isLocoalItemExist
+{
+    NSFileManager * fm = [NSFileManager defaultManager];
+    
+    if ([fm fileExistsAtPath:[DataItem savePath]]) {
+        
+        NSLog(@"磁盘中已经有用户信息，不需要网络请求");
+        
+        
+        return YES;
+    }
+    
+    return NO;
+}
+
+-(id)init
+{
+    if (self = [super init]) {
+        
+        
+    }
+    return self;
+}
+-(void)getUserInfo
+{
+//    BOOL isExist = [[self class] ]
+}
+-(void)connection
+{
+    NSUserDefaults * d = [NSUserDefaults standardUserDefaults];
+    
+    NSString * ddid = [d objectForKey:UD_ddid];
+    
+    NSMutableDictionary * postDict = [[NSMutableDictionary alloc]initWithObjectsAndKeys:ddid , @"D_ID", nil];
+    
+    DataItem * item = [[DataItem alloc]init];
+    
+}
+
+@end

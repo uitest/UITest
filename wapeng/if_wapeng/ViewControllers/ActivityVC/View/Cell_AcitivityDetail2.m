@@ -1,0 +1,40 @@
+//
+//  Cell_AcitivityDetail2.m
+//  if_wapeng
+//
+//  Created by 心 猿 on 14-9-1.
+//  Copyright (c) 2014年 funeral. All rights reserved.
+//
+
+#import "Cell_AcitivityDetail2.h"
+
+@implementation Cell_AcitivityDetail2
+
+- (void)awakeFromNib
+{
+    // Initialization code
+  
+    self.headerImageView.image = [UIImage imageNamed:@"saga2.jpg"];
+    
+    self.headerImageView.layer.masksToBounds = YES;
+    self.headerImageView.layer.cornerRadius = 5;
+    
+    self.cNameLabel.textColor = [UIColor redColor];
+    
+    self.contentLbl = [[TQRichTextView alloc]init];
+    self.contentLbl.frame = CGRectMake(CGRectGetMaxX(self.headerImageView.frame) + 5, CGRectGetMinY(self.headerImageView.frame), 220 * kMainScreenWidth / 320.0, 80);
+    self.contentLbl.backgroundColor = [UIColor whiteColor];
+//    self.contentLbl.backgroundColor = [UIColor redColor];
+    
+    self.contentLbl.font = [UIFont systemFontOfSize:18];
+    [self addSubview:self.contentLbl];
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated
+{
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+@end
